@@ -18,6 +18,7 @@
 <body>
 <!-- Container for the visualization -->
 <div id="vis1"></div>
+<div id="vis2"></div>
 
 
 <script>
@@ -31,7 +32,7 @@
             "point": {"size": 80}
         },
         "title": {
-            "text": "Visualizations From JSON Syntax Style Visualization Grammar",
+            "text": "Trading Chart Based on Destination State's GDP",
             "fontSize": 30,
             "anchor": "middle"
         },
@@ -128,7 +129,6 @@
                                 "empty": "all"
                             }
                         },
-                        "title": "Trading chart based on two states",
                         "transform": [
                             {"filter": {"selection": "selector002"}},
                             {"filter": {"selection": "selector001"}},
@@ -178,9 +178,164 @@
         "$schema": "https://vega.github.io/schema/vega-lite/v4.json"
     };
 
+    var vlSpec2 = {
+
+        "config": {
+            "view": {"width": 1200, "height": 500},
+            "point": {"size": 80}
+        },
+        "title": {
+            "text": "Trading Chart Based on Origin State's GDP",
+            "fontSize": 30,
+            "anchor": "middle"
+        },
+        "data": {
+            "url": "data/ACES_transformed_2.csv"
+        },
+
+        "hconcat": [
+            {
+                "vconcat": [
+                    {
+                        "mark": {"type": "circle", "size": 150},
+                        "title":"Category(Can Select Multiple)",
+                        "encoding": {
+                            "color": {
+                                "condition": {
+                                    "type": "nominal",
+                                    "field": "sctg2_description",
+                                    "legend": null,
+                                    "selection": "selector001"
+                                },
+                                "value": "lightgray"
+                            },
+                            "y": {
+                                "type": "nominal", "field":
+                                    "sctg2_description", "title": null
+                            }
+                        },
+                        "selection": {
+                            "selector001": {
+                                "type": "multi",
+                                "encodings": ["color"],
+                                "on": "click",
+                                "toggle": "event.shiftKey",
+                                "resolve": "global",
+                                "empty": "all"
+                            }
+                        }
+                    },
+                    {
+                        "mark": {"type": "circle", "size": 150},
+                        "title": "Year(Can Select Multiple)",
+                        "encoding": {
+                            "color": {
+                                "condition": {
+                                    "type": "nominal",
+                                    "field": "year",
+                                    "legend": null,
+                                    "selection": "selector003"
+                                },
+                                "value": "lightgray"
+                            },
+                            "y": {
+                                "type": "nominal", "field":
+                                    "year", "title": null
+                            }
+                        },
+                        "selection": {
+                            "selector003": {
+                                "type": "multi",
+                                "encodings": ["color"],
+                                "on": "click",
+                                "toggle": "event.shiftKey",
+                                "resolve": "global",
+                                "empty": "all"
+                            }
+                        }
+                    }]
+            }
+            ,
+            {
+                "vconcat": [
+                    {
+
+                        "mark": "point",
+                        "encoding": {
+                            "color": {"type": "nominal", "field": "sctg2_description", "legend": null},
+                            "tooltip": [
+                                {"type": "quantitative", "field": "year"},
+                                {"type": "nominal", "field": "name_state_orig", "title": "Origin State"},
+                                {"type": "nominal", "field": "name_state_dest", "title": "Destination State"},
+                                {"type": "quantitative", "field": "value"}
+                            ],
+                            "x": {"type": "nominal", "field": "name_state_dest", "title": "Destination State"},
+                            "y": {"type": "quantitative", "field": "value", "title": "Trading Value"}
+                        },
+                        "selection": {
+                            "selector001": {
+                                "type": "multi",
+                                "encodings": ["color"],
+                                "on": "click",
+                                "toggle": "event.shiftKey",
+                                "resolve": "global",
+                                "empty": "all"
+                            }
+                        },
+
+                        "transform": [
+                            {"filter": {"selection": "selector002"}},
+                            {"filter": {"selection": "selector001"}},
+                            {"filter": {"selection": "selector003"}}
+                        ],
+                    },
+                    {
+
+                        "mark": {"type": "bar", "size": 10},
+                        "encoding": {
+                            "color": {"value": "lightgray"},
+                            "tooltip": [
+                                {
+                                    "type": "nominal",
+                                    "field": "state_dest_gdp",
+                                    "title": "total"
+                                }
+                            ],
+                            "x": {"type": "nominal", "field": "name_state_orig",
+                                "title": "Origin State",
+                            "sort": {"field": "value", "order": "descending", "type": "quantitative"}},
+                            "y": {
+                                "type": "quantitative",
+                                "field": "value",
+                                "title": "GDP (in USD millions)"
+                            }
+                        },
+                        "height": 120,
+                        "selection": {
+                            "selector002": {
+                                "type": "interval",
+                                "encodings": ["x"],
+                                "on": "[mousedown, window:mouseup] > window:mousemove!",
+                                "translate": "[mousedown, window:mouseup] > window:mousemove!",
+                                "zoom": "wheel!",
+                                "mark": {"fill": "#333", "fillOpacity": 0.125, "stroke": "white"},
+                                "resolve": "global"
+                            }
+                        },
+                        "transform": [
+                            {"filter": {"selection": "selector003"}}
+                        ],
+                    },
+                ]
+            }
+        ],
+        "$schema": "https://vega.github.io/schema/vega-lite/v4.json"
+    };
+
 
     // Embed the visualization in the container with id `vis`
     vegaEmbed('#vis1', vlSpec1, {'actions': false});
+    vegaEmbed('#vis2', vlSpec2, {'actions': false});
 
 
 </script>
